@@ -15,7 +15,7 @@ git clone {remote_url} {directory_name}
 
 ## `git add`
 - working directory에서 변경된 파일을 staging area에 이동
-
+- Tracked상태의 파일을 수정한 후 `git status` 명령을 실행하면 "Changes no staged for commmit"이 나오는데 이는 수정한 파일이 Unstaged 상태라는 것이다. 
 ```
 git add {fie_name/directory_name}
 git add . => 현재 나의 위치를 기준으로 모든 파일과 폴더
@@ -27,13 +27,14 @@ git add . => 현재 나의 위치를 기준으로 모든 파일과 폴더
 
 ## `git log`
 - 커밋의 히스토리 조회
+- 가장 최근의 커밋이 가장 먼저 나옴
     - option
         - `--oneline`
         - `--graph`
 
 ## `git remote`
 - 원격저장소 관리 명령어
-
+- 현재 프로젝트에 등록된 리모트 저장소 확인
 - 원격 저장소 추가
     - 일반적으로 {remote_name}은 `origin`사용
 ```
@@ -42,6 +43,7 @@ git remote add {remote_name} {remote_url}
 ```
 
 - 원격저장소 확인
+- `-v` 옵션을 주어 단축이름과 URL을 함께 볼 수 있음
 ```
 git remote -v
 ```
