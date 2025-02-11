@@ -23,6 +23,7 @@ git add . => 현재 나의 위치를 기준으로 모든 파일과 폴더
 
 ## ` git commit`
 - staging area에 있는 변경사항을 커밋하여 스냅샷 생성
+- `git add` 명령어를 사용하여 Staged 상태로 만든 후 커밋해야함
 
 ## `git log`
 - 커밋의 히스토리 조회
