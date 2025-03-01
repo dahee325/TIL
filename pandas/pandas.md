@@ -289,6 +289,7 @@ df = df.rename(columns={'name': '이름'}) # 재할당
 import numpy as np
 import pandas as pd
 ```
+
 ## EXCEL
 - `pd.read_excel('파일경로')` : 엑셀파일 불러오기
     - 시트가 여러개일 경우 `sheet_name=''`옵션을 사용해서 엑셀파일 불러오기
@@ -444,6 +445,13 @@ df.loc[cond] # 위와 같은 코드
 ```
 
 # 04_statistics
+```python
+import pandas as pd
+import seaborn as sns
+
+df = sns.load_dataset('titanic')
+```
+
 ## describe()
 - `describe()` : 통계량 요약, 숫자만 가능
     - `include='object'`옵션을 지정하면 문자형인 통계량 요약
@@ -557,14 +565,241 @@ df.corr(numeric_only=True)['survived'] # 'survived'와 다른 컬럼 사이의 �
 ```
 
 # 05_missing_value
+```python
+import pandas as pd
+import seaborn as sns
+
+df = sns.load_dataset('titanic')
+```
+
 ## copy()
 - `copy()` : 데이터프레임 복제하기
 ```python
 df_copy = df.copy()
-id(df_copy), id(df) # id를 확인하면 주소?가 다름름
+id(df_copy), id(df) # id를 확인하면 주소?가 다름
 ```
 
 ## 결측치
 1. 결측 데이터 확인
 2. 결측치가 아닌 데이터 확인
 3. 결측치 채우기 or 결측 데이터 제거하기
+```python
+df_copy = df.copy()
+df_copy.isnull().sum() # 각 컬럼들의 결측치(True)를 합산하여 개수 확인
+df_copy.notna().sum() # 결측치가 아닌 값의 개수
+```
+
+### 결측 데이터 필터링
+```python
+cond = df_copy['age'].isnull() # 결측치를 가진 사람들의 목록
+df_copy.loc[cond, 'age'] = 30
+df_copy.tail()
+```
+
+## fillna()
+- `fillna()` : 결측치를 채우는 함수
+- 수정 결과를 저장하지 않고 결과만 출력, 재할당 해야됨
+```python
+df_copy['age'] = df_copy['age'].fillna(100)
+```
+- 카테고리 데이터는 지정하지 않은 데이터를 추가로 넣을 수 없음
+    - 카테고리에 먼저 추가한 후 결측치를 수정해야함
+```python
+df_copy['deck'] = df_copy['deck'].cat.add_categories('Z') # 카테고리에 'Z'추가
+df_copy['deck'].fillna('Z')
+```
+```python
+age_mean = df_copy['age'].mean()
+df_copy['age'] = df_copy['age'].fillna(age_mean) # 결측치를 평균값으로 바꿈
+```
+
+## dropna()
+- `dropna()` : 하나라도 결측값을 갖고 있으면 제거
+```python
+df_copy.dropna()
+df_copy.dropna(how='all') # 한 행의 전체 데이터가 결측값이면 제거
+```
+# 06_preprocessing(전처리)
+```python
+import seaborn as sns
+import pandas as pd
+
+df = sns.load_dataset('titanic')
+df_copy = df.copy()
+```
+
+## 컬럼 추가
+```python
+df_copy['VIP'] = False # 이름이 'VIP'이고 값이 False인 컬럼 추가
+df_copy['family'] = df_copy['sibsp'] + df_copy['parch']
+df_copy['gender'] = df_copy['sex'] + '-' + df_copy['who']
+df_copy['f/a'] = round(df_copy['fare'] / df_copy['age'], 2) # 반올림해서 소수점 2자리수까지 출력
+```
+
+## 삭제
+### 행 삭제
+- 지우고싶은 인덱스 지정, 원본수정X
+```python
+df_copy.drop(1)
+df_copy.drop(range(5)) # 0-4번까지의 데이터 삭제
+```
+
+### 열 삭제
+```python
+df_copy.drop('VIP', axis=1) # axis=1은 컬럼을 의미
+df_copy.drop('VIP', axis='columns')
+df_copy.drop(['deck', 'VIP', 'alive'], axis=1, inplace=True) # inplace=True 옵션은 원본에 저장함
+```
+
+## 데이터 타입
+- `value_counts()` : NaN값을 제외한 데이터의 개수
+- `astype()` : 강제적으로 데이터 형변환
+- `dtype` : 데이터 타입 확인
+```python
+df_copy['who'].value_counts()
+df_copy['who'] = df_copy['who'].astype('category')
+df_copy['who'].dtype
+```
+- `cat.codes` : 카테고리에 저장되어있는 정보를 자체적으로 숫자로 변경해서 봄
+- `cat.rename_categories()` : 카테고리의 이름 수정
+```python
+df_copy['who'].cat.codes # 'male', 'female', 'child'을 자체적으로 숫자로 변경해서 봄
+df_copy['who'] = df_copy['who'].cat.rename_categories(['아이', '남자', '여자'])
+```
+
+## datetime
+- `pd.date_range()` : 날짜데이터를 여러개 만들 떄 사용
+    - `periods=` 옵션은 생성할 날짜의 개수
+    - `freq=15h`은 날짜 간격 설정
+```python
+dates = pd.date_range('20250101', periods=df.shape[0], freq='15h') # 15시간 간격으로 행개수만큼 날짜데이터 생성
+```
+- `periods=df.shape[0]`은 생성할 날짜의 개수로 df의 행개수
+- `freq=15h`은 날짜 간격 설정으로 15시간 간격을 의미
+- `dt` : datetime 객체에 접근하기 위한 함수
+- `dt.day` : 몇 일인지 출력
+- `dt.dayofweek` : 요일, 0(월요일) ~ 6(일요일)
+```python
+df_copy['date'].dt.day
+df_copy['date'].dt.dayofweek
+
+cond = df_copy['date'].dt.dayofweek == 6
+df_copy.loc[cond].head(2)
+```
+
+## 자전거 데이터 활용
+```python
+df = pd.read_csv('data/seoul_bicycle.csv')
+```
+- `pd.to_datetime()` : 정보의 객체를 datetime으로 변환
+    - `format=` : datetime으로 바꿀 떄 형식 지정
+```python
+df_copy['대여일자'] = pd.to_datetime(df_copy['대여일자'], format='%b-%d-%Y') 
+
+cond = df_copy['대여일자'].dt.dayofweek == 3 # 대여일자의 요일이 3(수요일)인 데이터만 출력
+df_copy.loc[cond]
+```
+- `pd.to_numeric()` : 컬럼을 숫자로 바꿈
+    - `errors=''`옵션으로 에러가 생겼을 때 처리하는 방법을 지정
+        - `errors='coerce'` : 숫자로 바꿀 수 없는 값을 nan으로 지정
+```python
+df_copy['운동량'] = pd.to_numeric(df_copy['운동량'], errors='coerce')
+```
+
+## cut()
+- `cut(나눌 대상의 데이터, 구간 데이터)` : 구간 나누기
+- 이상치가 나오므로 나중에 이상치를 처리해야함
+```python
+bins = [0, 100, 200, 300, df_copy['운동량'].max()]
+pd.cut(df_copy['운동량'], bins)
+pd.cut(df_copy['운동량'], bins=10) # 자동으로 10개의 구간 나누기
+```
+- `qcut(나눌 대상의 데이터, 구간 데이터)` : 비율대로 구간 나눔
+    - `labels=[]` : 나눈 구간의 이름 설정
+```python
+pd.qcut(df_copy['운동량'], q=10) # 10%(q=10)의 비율대로 나눔
+qcut_bins = [0, 0.2, 0.8, 1] # 0~20%, 20~80%, 80~100%
+df_copy['운동량_한글'] = pd.qcut(df_copy['운동량'], qcut_bins, labels=['적음', '보통', '많음'])
+```
+
+# 07_ group
+```python
+import seaborn as sns
+import pandas as pd
+
+df = sns.load_dataset('titanic')
+```
+
+## groupby()
+- `groupby()` : 하나의 컬럼을 기준으로 묶어서 데이터 출력
+    - `numeric_only=True` 옵션을 지정하면 계산할 수 없는 데이터를 제외한 숫자형 데이터만 계산산
+```python
+df_copy.groupby('sex').mean(numeric_only=True) # 'sex'을 기준으로 데이터의 평균값 계산
+df_copy.groupby(['sex', 'pclass']).mean(numeric_only=True) # 여러개의 컬럼을 기준으로 할 때는 [](리스트) 사용
+df_copy.groupby(['sex', 'pclass'])[['survived']].mean(numeric_only=True) # 'sex'과 'pclass'를 기준으로 'survived'의 평균 계산
+```
+
+## reset_index()
+- `reset_index()` : 데이터프레임의 인덱스를 다시 설정, 기존 인덱스는 새로운 열로 이동
+    - `drop=True`옵션을 지정하면 기존 인덱스를 데이터프레임에서 삭제
+```python
+df_temp = df_copy.groupby(['sex', 'pclass'])[['survived']].mean()
+df_temp.reset_index()
+```
+
+## pivot_table()
+- `pivot_table(index='', values='')` : 각 컬럼이 어떤 관계를 갖고 있는지, corr()와 비슷
+```python
+df_copy.pivot_table(index='who', values = 'survived')
+df_copy.pivot_table(index=['who', 'pclass'], values='survived')
+```
+
+# 08_concat
+```python
+import pandas as pd
+
+df1 = pd.read_csv('data/sales_data1.csv')
+df2 = pd.read_csv('data/sales_data2.csv')
+```
+## concat()
+- `concat()` : 데이터프레임을 행 방향으로 연결
+    - `ignore_index=True`옵션을 지정하면 각 데이터의 인덱스 번호를 무시하고 새로 지정
+```python
+pd.concat([df1, df2], ignore_index=True)
+```
+    - `axis=1` : 컬럼을 기준으로 연결
+```python
+sales1 = df1.iloc[:, :5] # 첫번째 컬럼부터 다섯번째 컬럼까지 출력
+sales2 = df2.iloc[:, 5:] # 다섯번째 컬럼부터 마지막 컬럼까지 출력
+pd.concat([sales1, sales2], axis=1)
+```
+
+## merge()
+- `pd.merge(df1, df2)` : 데이터들의 교집합 데이터만 병합, 
+    - `how='inner'` : 교집합, 디폴트값
+    - `how='outer'` : 합집합, 비어있는 값은 NaN으로 채워줌
+    - `how='left'` : left에 있는 df1의 행에 df2 출력
+    - `how='right'` : right에 있는 df2의 행에 df1 출력
+    - `left_on=''` : 왼쪽 기준이 되는 컬럼의 이름 지정
+    - `right_on=''` : 오른쪽 기준이 되는 컬럼의 이름 지정
+```python
+info = {
+    '고객명': ['박세리', '이대호', '손흥민', '김연아', '마이클조던'],
+    '생년월일': ['1980-01-02', '1982-02-22', '1993-06-12', '1988-10-16', '1970-03-03'],
+    '성별': ['여자', '남자', '남자', '여자', '남자']
+}
+money = {
+    '고객명': ['김연아', '박세리', '손흥민', '이대호', '타이거우즈'],
+    '연봉': ['2000원', '3000원', '1500원', '2500원', '3500원']
+}
+
+df1 = pd.DataFrame(info)
+df2 = pd.DataFrame(money)
+
+pd.merge(df1, df2)
+pd.merge(df1, df2, how='inner') # 위의 코드와 같음
+pd.merge(df1, df2, how='outer')
+pd.merge(df1, df2, how='left')
+pd.merge(df1, df2, how='right')
+pd.merge(df1, df2, left_on='이름', right_on='고객명')
+```
