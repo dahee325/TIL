@@ -65,7 +65,7 @@ kn49.score(fish_data, fish_target)
 - `score()` 결과가 35/49와 같은 값으로 도미만 다 맞추고 빙어는 맞추지 못함
     - => 전체 데이터를 다 바라보는 것은 좋은 방법이 아님
 
-# 2-1
+# 2-1 데이터 다루기
 ## K-NN K-최근접 이웃
 ```python
 import pandas as pd
@@ -152,7 +152,7 @@ kn.fit(train_scaled, train_target['Species'])
 kn.score(test_scaled, test_target['Species'])
 ```
 
-# 3-1
+# 3-1 회귀 알고리즘과 모델 규제
 ## K-최근접 이웃 회귀
 -  ex) 샘플의 타깃값 : 100, 80, 60 => 샘플의 예측 타깃값 : (100 + 80 + 60) / 3 = 80
 
@@ -424,7 +424,7 @@ print(lasso.score(test_scaled, test_target))
 lasso.coef_
 ```
 
-# 4-1
+# 4-1 다양한 분류 알고리즘
 ```python
 # 데이터 불러오기
 import pandas as pd
@@ -551,3 +551,88 @@ sc.partial_fit(train_scaled, train_target)
 print(sc.score(train_scaled, train_target))
 print(sc.score(test_scaled, test_target))
  ```
+
+ # 5-1 트리 알고리즘
+```python
+# 데이터 불러오기
+import pandas as pd
+red_wine = pd.read_csv('data/winequality-red.csv', sep=';')
+white_wine = pd.read_csv('data/winequality-white.csv', sep=';')
+
+# 필요한 데이터 추출, 생성
+red_wine = red_wine[['alcohol', 'residual sugar', 'pH']]
+red_wine.rename(columns={'residual sugar': 'sugar'}, inplace=True)
+red_wine['class'] = 0
+
+white_wine = white_wine[['alcohol', 'residual sugar', 'pH']]
+white_wine.rename(columns={'residual sugar': 'sugar'}, inplace=True)
+white_wine['class'] = 1
+
+wine = pd.concat([red_wine, white_wine]) # concat() : 두개의 데이터 프레임을 위아래로 연결
+# wine.info()
+
+# 데이터세트 분리
+data = wine[['alcohol', 'sugar', 'pH']]
+target = wine[['class']]
+
+from sklearn.model_selection import train_test_split
+train_input, test_input, train_target, test_target = train_test_split(data, target)
+
+# 정규화
+from sklearn.preprocessing import StandardScaler
+ss = StandardScaler()
+ss.fit(train_input)
+train_scaled = ss.transform(train_input)
+test_scaled = ss.transform(test_input)
+
+# 로지스틱 회귀
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression()
+lr.fit(train_scaled, train_target)
+print(lr.score(train_scaled, train_target))
+print(lr.score(test_scaled, test_target))
+
+print(lr.coef_, lr.intercept_)
+```
+ ## 결정 트리
+ - `DecisionTreeClassifier()` : 결정트리(스무고개와 같음), 비선형
+ ```python
+from sklearn.tree import DecisionTreeClassifier
+
+dt = DecisionTreeClassifier() 
+# dt.fit(train_scaled, train_target)
+dt.fit(train_input, train_target)
+
+# print(dt.score(train_scaled, train_target))
+# print(dt.score(test_scaled, test_target))
+print(dt.score(train_input, train_target))
+print(dt.score(test_input, test_target))
+ ```
+ 
+ ### 결정트리 시각화
+ - `plt.figure()` : plot의 크기 지정
+ - `plot_tree()` : 트리 그림 출력
+ - 지니 불순도(gini) : 데이터 트리가 얼마나 한쪽으로 편향되어있는지, 낮을수록 좋음
+```python
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+
+plt.figure(figsize=(10, 7)) 
+plot_tree(dt, max_depth=1) # max_depth=1 : 트리 구조의 상단만 출력
+plt.show()
+```
+
+### 가지치기
+- `DecisionTreeClassifier()`의 옵션 `max_depth=` : 최대 몇개의 노드를 출력할지 지정
+```python
+from sklearn.tree import DecisionTreeClassifier
+
+dt = DecisionTreeClassifier(max_depth=3) # max_depth=3으로 주니까 과대적합은 해결, 정확도는 떨어짐
+# dt.fit(train_scaled, train_target)
+dt.fit(train_input, train_target)
+
+# print(dt.score(train_scaled, train_target))
+# print(dt.score(test_scaled, test_target))
+print(dt.score(train_input, train_target))
+print(dt.score(test_input, test_target))
+```
