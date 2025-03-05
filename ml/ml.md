@@ -423,3 +423,131 @@ print(lasso.score(test_scaled, test_target))
 
 lasso.coef_
 ```
+
+# 4-1
+```python
+# 데이터 불러오기
+import pandas as pd
+df = pd.read_csv('data/Fish.csv')
+
+# 필요한 데이터 추출하기
+fish_input = df[['Weight', 'Length2', 'Length3', 'Height', 'Width']]
+fish_target = df[['Species']]
+
+# 데이터세트 분리하기
+from sklearn.model_selection import train_test_split
+train_input, test_input, train_target, test_target = train_test_split(fish_input, fish_target)
+
+# 정규화(표준화)
+from sklearn.preprocessing import StandardScaler
+ss = StandardScaler()
+ss.fit(train_input)
+train_scaled = ss.transform(train_input)
+test_scaled = ss.transform(test_input)
+
+# 학습시키고 점수화하기
+from sklearn.neighbors import KNeighborsClassifier
+
+kn = KNeighborsClassifier()
+kn.fit(train_scaled, train_target)
+
+print(kn.score(train_scaled, train_target))
+print(kn.score(test_scaled, test_target))
+```
+- `kn.predict_proba()` : 클래스별 예측한 확률값
+```python
+kn.predict_proba(test_scaled)
+# 5개의 최근접이웃을 사용하기 때문에 확률은 0/5, 1/5, 2/5, 3/5, 4/5, 5/5 6개만 나옴
+```
+## 로지스틱 회귀
+- `LogisticRegression` : 이름은 회귀(z값을 도출)이지만 분류(z값을 기반으로 확률 도출)모델
+- 확률로 바꿀 때 시그모이드 함수 이용
+
+### 이진분류
+- 불리언 인덱싱(True, False)을 적용하여 필요한 데이터 골라내기
+```python
+bream_smelt_indexes = (train_target == 'Bream') | (train_target == 'Smelt') # => True, False 반환
+
+train_bs = train_scaled[bream_smelt_indexes['Species']]
+target_bs = train_target[bream_smelt_indexes['Species']]
+
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression()
+
+lr.fit(train_bs, target_bs)
+
+lr.predict(train_bs[:5])
+lr.predict_proba(train_bs[:5]).round(3) # => (Bream일 확률, Smelt일 확률)
+
+print(lr.coef_, lr.intercept_) 
+# => z = -0.43 * Weight -0.63 * Length2 -0.72 * Length3 + -1.05 * Height -0.81 * Width -2.07
+```
+
+### 다중분류
+- z값을 확률로 바꿀 때 소프트맥스(softmax()) 함수 사용\
+=> 7개(물고기의 종류)의 방정식 확률 결과의 합이 1이 되도록 만들어주는 함수
+- `LogisticRegression`
+    - `C=` : 규제를 제어하는 매개변수
+    - `max_iter=` : 반복횟수 지정
+```python
+lr = LogisticRegression(C=5, max_iter=1000)
+lr.fit(train_scaled, train_target)
+
+print(lr.score(train_scaled, train_target))
+print(lr.score(test_scaled, test_target))
+
+lr.predict_proba(test_scaled[:5]).round(3)
+lr.coef_.shape # => (7, 5)
+# 총 7마리의 종류에서 분류해야 하기 때문에 방정식이 7개 세워짐
+```
+
+# 4-2
+```python
+# 데이터 불러오기
+import pandas as pd
+df = pd.read_csv('data/Fish.csv')
+
+# 필요한 데이터 추출
+fish_input = df[['Weight', 'Length2', 'Length3', 'Height', 'Width']]
+fish_target = df[['Species']]
+
+# 학습 데이터와 테스트 데이터 분리하기
+from sklearn.model_selection import train_test_split
+train_input, test_input, train_target, test_target = train_test_split(fish_input, fish_target)
+
+# 정규화하기
+from sklearn.preprocessing import StandardScaler
+ss = StandardScaler()
+ss.fit(train_input)
+train_scaled = ss.transform(train_input)
+test_scaled = ss.transform(test_input)
+```
+## 확률적 경사 하강법(SGD)
+- `SGDClassifier`: 점진적 학습 알고리즘
+    - `loss=` : 손실함수 종류 지정, 디폴트는 'hinge'
+    - `max_iter=` : 반복횟수 지정
+- 랜덤하게 기울기를 따라 내려갈 것 => 가장 아래부분을 찾는 것이 우리의 목표
+
+### 손실함수
+- 어떤 문제에서 머신러닝 알고리즘이 얼마나 엉터리인지를 측정
+- 손실(실패율)함수의 값이 낮을수록 좋음 => 손실함수의 값을 떨어트려야함
+- 미분이 가능해야함(연속적 데이터) => 로지스틱 회귀 모델 사용
+- 예측이 맞으면 음수로 변환
+```python
+# 확률적 경사 하강법 사용하기
+from sklearn.linear_model import SGDClassifier
+
+sc = SGDClassifier(loss='log_loss', max_iter=100)
+sc.fit(train_scaled, train_target)
+
+print(sc.score(train_scaled, train_target))
+print(sc.score(test_scaled, test_target))
+```
+- `partial_fit()` : 에포크(딥러닝에서 학습 데이터를 한 번 학습하는 횟수)을 한번 더 실행\
+ => 무한히 실행한다고 좋아지는 것은 아님, 적절한 때를 찾아야함
+ ```python
+sc.partial_fit(train_scaled, train_target)
+
+print(sc.score(train_scaled, train_target))
+print(sc.score(test_scaled, test_target))
+ ```
