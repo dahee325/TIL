@@ -1,4 +1,6 @@
 # HTML
+- [W3 school html](https://www.w3schools.com/tags/default.asp)
+- [mdn web docs html](https://developer.mozilla.org/en-US/docs/Web/HTML)
 - <!--주석달기(ctrl + /)-->
 ```html 
 <태그명 속성명1="속성값1" 속성명2="속성값2"> 내용 </태그명>
