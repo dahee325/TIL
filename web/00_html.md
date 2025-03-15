@@ -1,4 +1,5 @@
 # HTML
+- html :  웹 페이지의 콘텐츠와 구조를 정의하는 데 사용되는 마크업 언어, `<tag>`를 사용하여 구조화
 - [W3 school html](https://www.w3schools.com/tags/default.asp)
 - [mdn web docs html](https://developer.mozilla.org/en-US/docs/Web/HTML)
 - 주석달기(ctrl + /) `<!--주석-->`
