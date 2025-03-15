@@ -1,17 +1,20 @@
 # form
 - `<form> </form>` : 사용자가 어떤 값을 입력하는 것 => 하나의 도화지라 생각
 - `<input type="" id="" name="">` : 회원가입, 게시물 등을 작성할 떄 사용
-    - `type=""` : 필요에 따라 찾아서 바꾸기
+    - `type=""` : 어떤 데이터를 넣을지 유형 지정 필요에 따라 찾아서 바꾸기
         - `type="text"` : 글자
         - `type="number"` : 숫자
         - `type="email"` : 이메일
         - `type="color"` : 색상
-        - `type="button"` : 
+        - `type="button"` : 클릭 가능한 버튼
         - `type="checkbox"` : 중복체크
         - `type="radio"` : 하나만 체크
         - `type="submit"` : 제출버튼, 제출하면 URL주소가 바뀜 => 요소로 키값=입력값 추가가
     - `id=""` : 라벨과 결합될 요소의 id속성값
-    - `name=""` : URL주소 요소의 키값 지정
-    - `value=""` : URL주소 요소의 입력값 지정
+    - `name=""` : 데이터를 보낼 때 값의 이름 지정
+    - `value=""` : 데이터를 보낼 떄 입력값의 이름 지정
 - `<label for=""> text </label>` : input의 이름 설정, input과 한 세트
     - `for=""` : 해당 라벨의 id와 똑같은 이름을 넣어줘야함
+- `<div> </div>` : 영역 나누기, 네모로 묶어줌
+- `<select> </select>` : 드랍다운박스라고 함, 목록 중 선택
+    - `<option> </option>` : 드랍다운 리스트에 어떤 옵션을 담을지 정의
