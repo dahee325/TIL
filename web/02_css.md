@@ -107,6 +107,8 @@ div p {...}
     - `border-style: solid` : 실선 테두리
     - `border-style: double` : 이중선 테두리
     - `border-style: dotted` : 점선 테두리
+- `width` : 가로 길이 지정
+- `height` : 세로 길이 지정
 
 ### 텍스트
 - `color: 속성값;` : 텍스트 색
