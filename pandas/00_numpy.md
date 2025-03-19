@@ -7,6 +7,7 @@ import numpy as np
 - `%timeit` : 코드를 실행하는데 시간이 얼마나 걸리는지 측정
 
  ## ndarray 생성
+- ndarray : numpy의 핵심인 다차원 행렬 자료구조 클래스
 - `np.arange()` : `range()`함수와 동일,\
  `range()`함수는 정수단위만 지원하지만 `np.arange()`함수는 실수단위도 표현가능
  ```python
