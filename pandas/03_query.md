@@ -1,4 +1,5 @@
 # 03_query
+- 쿼리(query) : 정제된 데이터에서 특정 조건을 만족하는 결과를 추출하기 위해 사용
 - `sns.load_dataset('데이터셋이름')` : 데이터셋 불러오기기
 ```python
 import seaborn as sns
