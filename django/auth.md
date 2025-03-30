@@ -1,4 +1,5 @@
-### User, Article, Comment 페이지 만들기
+### [auth](https://github.com/dahee325/auth)
+- User, Article, Comment 페이지 만들기
 
 
 # 00. setting
@@ -18,26 +19,9 @@
 - `AUTH/templates/base.html` : 폴더랑 파일 생성
 - `auth/settings.py`에 `templates` 등록
 - `templates/base.html`
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-</head>
-<body>
-    <div class="container">
-        {% block body %}
-        {% endblock %}
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
-</html>
-```
 
 # 03. [User](https://docs.djangoproject.com/en/5.1/topics/auth/customizing/)
+
 ## 3-1. Modeling
 - `accounts/models.py` : 장고가 미리 만들어놓은 앱스트립트 사용\
 => 변수를 추가하고싶으면 `User`클래스 안에 선언
@@ -61,37 +45,9 @@ AUTH_USER_MODEL = 'accounts.User' # 대소문자 주의
 - `python manage.py migrate`
 
 ## 3-3. Signup 기능 만들기 (Create)
-- `auth/urls.py` : 경로 설정
-```python
-from django.urls import path, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
-]
-```
-- `accounts/urls.py` 파일 생성
-```python
-from django.urls import path
-from . import views
-
-app_name = 'accounts'
-
-urlpatterns = [
-    path('signup/', views.signup, name='signup'),
-]
-```
-- `accounts/views.py`
-```python
-from django.shortcuts import render
-
-# Create your views here.
-def signup(request):
-    if request.method == 'POST':
-        pass
-    else:
-        form = UserForm()
-```
+- `auth/urls.py` : 공통 `accounts/` 경로 설정
+- `accounts/urls.py` 파일 생성 : `signup/` 경로 설정정
+- `accounts/views.py` : `signup`함수 만들기
 - `accounts/forms.py` 파일 생성 => 장고가 만들어놓은 form 그대로 사용
 ```python
 from .models import User
@@ -103,7 +59,7 @@ class CustomUserCreationForm(UserCreationForm):
         # 장고가 만들어놓은 UserCreationForm에서 model만 우리가 만든 USer로 바꿈
         fields = '__all__'
 ```
-- `accounts/views.py`
+- `accounts/views.py` : `signup`함수 만들기 
 ```python
 from django.shortcuts import render
 from .forms import CustomUserCreationForm
@@ -121,14 +77,6 @@ def signup(request):
     return render(request, 'signup.html', context)
 ```
 - `accounts/templates/signup.html`
-```html
-{% extends 'base.html' %}
-
-{% block body %}
-    {{form}}
-
-{% endblock %}
-```
 - `accounts/forms.py`
 ```python
 class CustomUserCreationForm(UserCreationForm):
@@ -139,17 +87,6 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', )
 ```
 - `accounts/templates/signup.html`
-```html
-{% extends 'base.html' %}
-
-{% block body %}
-<form action="" method="POST">
-    {% csrf_token %}
-    {{form}}
-    <input type="submit">
-</form>
-{% endblock %}
-```
 - `accounts/views.py` : if문 채우기(저장)
 ```python
 from django.shortcuts import render, redirect
@@ -173,15 +110,7 @@ def signup(request):
 
 ## 3-4. Login 기능 만들기 (Create)
 - 내 데이터를 주고 전체 데이터를 받음
-- `accounts/urls.py` : 경로 설정
-```python
-app_name = 'accounts'
-
-urlpatterns = [
-    path('signup/', views.signup, name='signup'),
-    path('login/', views.login, name='login'), 
-]
-```
+- `accounts/urls.py` : `login/` 경로 설정
     ### 개발자도구 Cookies
     -  웹사이트 개발자도구의 `Application/Storage/Cookies` : 인터넷(크롬, 엣지)안의 행동(정보)에 대해서 저장(기록) => ex.장바구니, 로그인
     - 아이디의 비밀번호를 만들면 장고가 `user_session`에 로그인 상태를 암호화해서 저장함 => 그 암호화된 `session`을 갖고있으면 로그인한 상태가 됨
@@ -190,7 +119,7 @@ urlpatterns = [
         - 사이트의 팝업창 (닫기, 오늘 그만 보기) -> 오늘 그만 보기를 누르면 `Cookies/closePopup`이 `done`으로 돼서 새로고침하면 팝업창이 보이지 않음
         - `github`사이트의 로그인한 상태에서 개발자도구의 `Cookies/user_session`을 지우면 로그아웃된 상태가 됨
 
-- `accounts/views.py`
+- `accounts/views.py` : `login`함수 만들기
 ```python
 def login(request):
     if request.method == 'POST':
@@ -219,18 +148,7 @@ def login(request):
     return render(request, 'login.html', context)
 ```
 - `accounts/templates/login.html` 파일 생성 : 로그인 창 보여주기
-```html
-{% extends 'base.html' %}
-
-{% block body %}
-    <form action="" method="POST">
-        {% csrf_token %}
-        {{form}}
-        <input type="submit">
-    </form>
-{% endblock %}
-```
-- `accounts/views.py`
+- `accounts/views.py` : if문 채우기기
 ```python
 from django.contrib.auth import login as auth_login # 로그인을 처리해주는 함수
 # 우리도 login함수를 만들었으므로 겹치지 않기 위해 장고의 login함수를 auth_login으로 불러옴
@@ -264,23 +182,8 @@ def login(request):
 ```
 
 ## 3-4. Logout 기능 만들기
-- `accounts/urls.py`
-```python
-urlpatterns = [
-    path('signup/', views.signup, name='signup'),
-    path('login/', views.login, name='login'), 
-    path('logout/', views.logout, name='logout',),
-]
-```
-- `accounts/views.py`
-```python
-from django.contrib.auth import logout as auth_logout
-
-def logout(request):
-    auth_logout(request)
-
-    return redirect('accounts:login')
-```
+- `accounts/urls.py` : `logout/` 경로 설정
+- `accounts/views.py` : `logout/` 함수 만들기
 
 ## 3-5. 로그인 상태에 따른 navbar 구조 변경
 - `templates/base.html`
@@ -308,7 +211,7 @@ def logout(request):
 - `auth/settings.py`에 앱 등록
 
 ## 4-2. Modeling
-- `articles/models.py`
+- `articles/models.py` : `Article` 모델 만들기
 ```python
 from django.db import models
 from accounts.models import User
@@ -333,38 +236,10 @@ class Article(models.Model):
 - `python manage.py migrate`
 
 ## 4-4. Article
-- `auth/urls.py`
-```python
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
-    path('articles/', include('articles.urls')),
-]
-```
-- `articles/urls.py` 파일 생성
-```python
-from django.urls import path
-from . import views
-
-app_name = 'articles'
-
-urlpatterns = [
-    path('', views.index, name='index'), 
-]
-```
-- `articles/views.py`
-```python
-def index(request):
-    return render(request, 'index.html')
-```
+- `auth/urls.py` : 공통 `article/`경로 설정
+- `articles/urls.py` 파일 생성 : `index` 페이지 경로 설정
+- `articles/views.py` : `index`함수 만들기기
 - `articles/templates/index.html` 폴더랑 파일 생성
-```html
-{% extends 'base.html' %}
-
-{% block body %}
-    <h1>index</h1>
-{% endblock %}
-```
 
 ## 4-5. Article Create
 - `templates/base.html`
@@ -385,21 +260,8 @@ def index(request):
     ...
 </body>
 ```
-- `articles/urls.py`
-```python
-urlpatterns = [
-    path('', views.index, name='index'), 
-    path('create/', views.create, name='create'),
-]
-```
-- `articles/views.py`
-```python
-def create(request):
-    if request.method == 'POST':
-        pass
-    else:
-        pass
-```
+- `articles/urls.py` : `create/`경로 설정
+- `articles/views.py` : `create`함수 만들기기
 - `articles/forms.py` 파일 생성
 ```python
 from django.forms import ModelForm
@@ -426,17 +288,6 @@ def create(request):
     return render(request, 'create.html', context)
 ```
 - `articles/templates/create.html` 파일 생성
-```html
-{% extends 'base.html' %}
-
-{% block body %}
-    <form action="" method="POST">
-        {% csrf_token%}
-        {{form}}
-        <input type="submit" class="mt-3">
-    </form>
-{% endblock %}
-```
 - `articles/forms.py` : user 보이지 않게 설정
 ```python
 class ArticleForm(ModelForm):
@@ -476,18 +327,7 @@ def index(request):
     return render(request, 'index.html', context)
 ```
 - `articles/templates/index.html`
-```html
-{% block body %}
-    <h1>index</h1>
 
-    {% for article in articles %}
-        <h3>{{article.title}}</h3>
-        <p>{{article.content}}</p>
-        <p>{{article.user}}</p>
-        <hr>
-    {% endfor %}
-{% endblock %}
-```
 
 ## 4-7. 로그인 상태에 따른 게시물 작성
 - `articles/views.py`
@@ -542,7 +382,7 @@ def login(request):
 
 # 05. Comment
 ## 5-1. modeling
-- `articles/models.py`
+- `articles/models.py` : `Comment`모델 만들기
 ```python
 class Comment(models.Model):
     content = models.TextField()
@@ -555,14 +395,14 @@ class Comment(models.Model):
 - `python manage.py migrate`
 
 ## 5-3. 댓글 빈종이 보여주기
-- `articles/forms.py`
+- `articles/forms.py` : `CommentForm` 만들기기
 ```python
 class CommentForm(ModelForm):
     class Meta():
         model = Comment
         fields = ('content', )
 ```
-- `articles/views.py`
+- `articles/views.py` : `detail`페이지에 `CommentForm` 추가
 ```python
 def detail(request, id):
     article = Article.objects.get(id=id)
