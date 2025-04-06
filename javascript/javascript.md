@@ -235,3 +235,72 @@ console.log(cube(10))
 ```
 
 # 10. 이벤트
+## 10-1. onclick
+- `onclick` : 클릭했을 때 반응
+- `querySelector()` : 특정 조건에 맞는 요소를 찾을 때 사용
+```js
+document.querySelector('html').onclick = function() {
+    alert('hello!') // alert() : 팝업창 띄우기
+}
+```
+
+## 10-2. addEventListener
+- `<element>.addEventListener(무슨일이 일어났을 때, 무슨 행동을 할지)` : 특정 상황이 일어날 때까지 기다림
+```js
+let myH1 = document.querySelector('h1')
+myH1.addEventListener('click', function(e) { // e : envet
+    console.log(e)
+    console.log(e.clientX, e.clientY)
+})
+```
+
+- `index.html`파일 에 `img`태그가 여러개 있다면 클래스를 지정해서 `img.class`로 찾기
+```js
+let myImg = document.querySelector('img')
+myImg.addEventListener('click', function() {
+    let src = myImg.getAttribute('src')
+    if (src === 'images/blue_miffy.png') {
+        myImg.setAttribute('src', 'images/firefox-icon.png')
+    } else {
+        myImg.setAttribute('src', 'images/blue_miffy.png')
+    }
+})
+```
+
+## 10-3. keydown
+```js
+let myInput = document.querySelector('input')
+myInput.addEventListener('keydown', function(e) {
+    console.log(myInput.value)
+})
+```
+
+# 11. 비동기
+- calback함수
+- `setTimeout()` : 몇 초 이후에 무슨 일을 시킬 때 사용
+```js
+setTimeout(function(){console.log('1234')}, 1000)
+console.log('bye')
+```
+```js
+// request
+const URL = 'https://jsonplaceholder.typicode.com/todos/1'
+```
+
+## 11-1. 비동기 처리 방법 1 : Promise
+- `fetch` : 외부로 요청을 보냄
+```js
+let response = fetch(URL)
+    .then(response => response.json())
+    .then(json => console.log(json))
+```
+
+## 11-2. 비동기 처리 방법 2 : async await
+```js
+async function fetchTodo(url) {
+    let res = await fetch(url)
+    let result = await res.json()
+    console.log(result)
+}
+console.log(fetchTodo(URL))
+```
