@@ -12,5 +12,8 @@ TIL(Today I Learned)
 - python
 - pandas
 - ml
-- chatbot
 - web
+- django
+- javascript
+- sql-orm
+- aws
