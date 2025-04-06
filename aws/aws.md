@@ -3,13 +3,12 @@
 - 빌리는 컴퓨터의 위치 -> 서울
 - `ec2` 검색 => 대시보드
 
-
 ### DNS
 - 내가 원하는 도메인네임을 쓸려면 dns를 사용해야함\
 => 사야함, godday로 가격확인
 
-
 - [강사님 notion](https://echo-edu.notion.site/deploy-1cb82d1dd35f80d98a3ddb9368bb193c)
+
 
 # setting
 ## 도메인 허용
@@ -83,5 +82,4 @@ urlpatterns = [
 
 
 # nginx 설치
-
 - `pip install uwsgi` : nginx와 django연결
