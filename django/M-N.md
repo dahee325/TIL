@@ -920,7 +920,7 @@ def like(request, post_id):
 
     return redirect('posts:index')
 ```
-- `posts/templates/_cared.html`
+- `posts/templates/_card.html`
 ```html
 <div class="card my-3 p-0 col-12 offset-md-4 col-xl-4">
 
