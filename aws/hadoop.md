@@ -158,3 +158,8 @@ hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar pi 10 1000
 - `localhost:9870`링크의 `Utilities` -> `Browse the file system`
 - `hdfs dfs -put ml-25m/ratings.csv /`
 - `9870`링크 새로고침하면 `ratings.csv` 파일이 올라감
+
+
+## Hadoop 종료
+- `sbin/stop-dfs.sh`
+- `sbin/stop-yarn.sh`
