@@ -110,7 +110,7 @@ apple
 - 수정하면 전체르 삭제하고 다시 업로드해야함
 
 
-## 2, 3. Splitting & Mapping
+## 2, 3. Splitting & Mapping => Mapper
 - `damf2/hadoop/0.wordcount/mapper.py`
 ```python
 #!/usr/bin/env python3
@@ -245,7 +245,7 @@ hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar\
 hdfs dfs -put ml-25m/ratings.csv /input
 ```
 
-## 2, 3. Splitting, Mapping
+## 2, 3. Splitting & Mapping => Mapper
 - `damf2/hadoop/1.movie-rate-avg/mapper.py`
 ```python
 import sys
@@ -323,7 +323,7 @@ hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
 - `2.log-time`폴더 만들고 그 안에 `mapper.py`, `reducer.py`파일 만들기
 - `hdfs dfs -put access.log /input` : 파일 업로드
 
-## 2, 3. Splitting, Mapping
+## 2, 3. Splitting & Mapping => Mapper
 - 정규 표현식 : 특정한 패턴과 일치하는 문자열 골라내기
 ![정규 표현식](/assets/regexp.png)
 - `damf2/hadoop/2.log-time/mapper.py`
@@ -345,6 +345,7 @@ for line in sys.stdin:
 ```
 
 ## 4. Shuffling
+- Hadoop 프레임워크가 내부적으로 자동 정렬해줌
 
 ## 5. Reducing
 - `damf2/hadoop/2.log-time/reducer.py`
