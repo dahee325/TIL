@@ -177,3 +177,28 @@ hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar
 -mapper /home/ubuntu/damf2/hadoop/0.wordcount/mapper.py 
 -reducer /home/ubuntu/damf2/hadoop/0.wordcount/reducer.py
 ```
+## 실행 권한 설정
+- `mapper.py`와 `reducer.py`에 `#!/usr/bin/env python3`추가
+- `~/damf2/hadoop/0.wordcount`위치에서 
+```shell
+ls -l
+
+# 결과
+# -rw-r--r-- 1 ubuntu ubuntu 441 Apr  8 13:36 mapper.py
+# -rw-r--r-- 1 ubuntu ubuntu 758 Apr  8 13:36 reducer.py
+# -rw-r--r-- 1 ubuntu ubuntu 103 Apr  8 11:41 text.txt
+```
+![chmod wrx](/assets/rwx.png)
+```shell
+chmod +x mapper.py # mapper.py에 x권한 추가
+
+# 결과
+# -rwxr-xr-x 1 ubuntu ubuntu 441 Apr  8 13:36 mapper.py => chmod 755
+# -rw-r--r-- 1 ubuntu ubuntu 758 Apr  8 13:36 reducer.py
+# -rw-r--r-- 1 ubuntu ubuntu 103 Apr  8 11:41 text.txt
+```
+- `mapper.py`와 `reducer.py` 모두 chmod 755로 바꾸기
+```shell
+chmod 755 mapper.py
+chmod 755 reducer.py
+```
