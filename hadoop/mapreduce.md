@@ -79,7 +79,7 @@ hdfs dfs -rm -r /input
 ![alt text](/assets/hadoop_host.png)
 
 
-# MapReduce 실습1 - wordcount
+# Linux MapReduce 실습1 => wordcount
 ## 1. Input
 ### 1-1. 하둡에 input, output 폴더 생성
 - `hdfs dfs -mkdir /input`
@@ -113,17 +113,24 @@ apple
 ## 2, 3. Splitting & Mapping
 - `damf2/hadoop/0.wordcount/mapper.py`
 ```python
+#!/usr/bin/env python3
+
 import sys # system
 
-# splitting
+# 파일을 줄별로 쪼개기
 for line in sys.stdin: # stdin(standardinput) : 파일 전체
     line = line.strip() # 좌우 공백 없애기
     words = line.split() # 띄어쓰기를 기준으로 단어 쪼개기
     # words에는 리스트의 형태로 ['apple', 'hello', 'world'] 저장되어있음
     
-    # mapping
     for word in words:
         print(f'{word}\t1') # \t : 탭(간격두기)
+        # apple 1
+        # hello 1
+        # world 1
+        # hello 1
+        # hello 1
+        # ...
 ```
 
 - `cat text.txt | python3 mapper.py ` : `|`는 앞에서 출력된 결과를 뒤쪽 명령어의 입력(stdin) 으로 전달\
@@ -160,13 +167,17 @@ for line in sys.stdin:
         last_word = word # 글자가 바뀜
         total_count = value # 글자가 바꼈으니까 total_count 값 초기화
 
+# 마지막 단어
 if last_word == word:
     print(f'{last_word}\t{total_count}')
 ```
 - `cat text.txt | python3 mapper.py | sort | python3 reducer.py`
 
-## Hadoop으로 실행
-### jar 제출
+## 6. Hadoop으로 실행
+### 6-1. jar 제출
+- **jar** : Java ARchive의 약자로 Java로 작성된 프로그램을 하나의 파일로 묶은 것
+- 하둡은 원래 Java기반이기 때문에 우리가 MapReduce 로직을 Java로 작성한 뒤 jar로 만들어서 제출\
+=> 작성한 MapReduce 프로그램을 Hadoop 클러스터에 보내서 실행하라는 명령
 - `hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar` -> 추가로 4가지 인자를 입력해줘야함
     - input, output, mapper, reducer의 경로를 알려줘야함(풀로 알려줘야함)
 - 최종코드 => 에러가 생기는게 맞음(몇 가지 설정을 해줘야함)
@@ -177,7 +188,7 @@ hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
 -mapper /home/ubuntu/damf2/hadoop/0.wordcount/mapper.py \
 -reducer /home/ubuntu/damf2/hadoop/0.wordcount/reducer.py
 ```
-### 실행 권한 설정
+### 6-2. 실행 권한 설정
 - `mapper.py`와 `reducer.py`에 `#!/usr/bin/env python3`추가
 - `~/damf2/hadoop/0.wordcount`위치에서 
 ```shell
@@ -202,7 +213,7 @@ chmod +x mapper.py # mapper.py에 x권한 추가
 chmod 755 mapper.py
 chmod 755 reducer.py
 ```
-### jar 다시 실행
+### 6-3. jar 다시 실행
 ```shell
 hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
 -input /input/text.txt \
@@ -224,7 +235,7 @@ hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar\
 ![wordcount part-00000](/assets/part-00000.png)
 
 
-# Hadoop MapReduce 실습2 - movie-rate-avg
+# Hadoop MapReduce 실습2 => movie-rate-avg
 ## 1. Input
 - `damf2/hadoop`안에 `1.movie-rate-avg`폴더 생성
 - `1.movie-rate-avg`폴더 안에 `mapper.py`, `reducer.py`파일 생성
@@ -251,6 +262,10 @@ for line in sys.stdin:
     rating = fields[2]
 
     print(f'{movie_id}\t{rating}')
+    # 296   5.0
+    # 306   3.5
+    # 307   5.0
+    # ...
 ```
 
 ## 4. Shuffling
@@ -270,7 +285,7 @@ for line in sys.stdin:
     line = line.strip()
     movie_id, rating = line.split()
 
-    try: # 문자형이면 밑의 코드 실행
+    try: # 에러가 발생할 수도 있는 코드
         rating = float(rating)
     except: # 실행을 하다가 문제가 발생한다면
         continue # 실행중인 for문을 무시하고 다음 for문을 실행
@@ -300,7 +315,7 @@ hadoop jar ~/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
 ```
 
 
-# Hadoop MapReduce 실습3 - log-time
+# Hadoop MapReduce 실습3 => log-time
 ## 1. Input
 - 위치 이동 `cd ~/damf2/data`
 - 파일 다운 : `wget https://www.dropbox.com/scl/fi/wod7g50jn1hminke9rw6v/access.log?rlkey=mko4lwr36s95mej6nkxudbegx&st=c0eu3p43&dl=0`\
