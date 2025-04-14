@@ -45,6 +45,7 @@ export PATH=$PATH:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin
 ```shell
 source ~/.bashrc
 hbase shell
+# exit로 나가기
 ```
 
 ### create
