@@ -17,3 +17,5 @@ TIL(Today I Learned)
 - javascript
 - sql-orm
 - aws
+- hadoop
+- automation
