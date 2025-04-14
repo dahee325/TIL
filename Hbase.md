@@ -91,3 +91,36 @@ disable 'students'
 drop 'students'
 list # => 0개의 행을 가진 빈 테이블
 ```
+## 채팅 서비스 모델링
+### create table
+```shell
+create 'chatroom', 'info'
+create 'messages', 'info'
+```
+### 채팅방 생성
+```shell
+put 'chatroom', 'room1', 'info:name', 'python chatroom'
+put 'chatroom', 'room2', 'info:name', 'finance chatroom'
+```
+### 메세지 전송
+```shell
+put 'messages', 'room1_143900', 'info:text', 'python version?'
+put 'messages', 'room1_143901', 'info:text', '3.13.2 :)'
+
+put 'messages', 'room2_144000', 'info:text', 'tesla bad'
+put 'messages', 'room2_144030', 'info:text', ':('
+```
+### 메세지 조회
+```shell
+# 3개의 메세지만 조회
+scan 'messages', { LIMIT => 3 }
+
+# 특정 컬럼만 조회
+scan 'messages', { COLUMNS => ['info:text'] }
+
+# 특정 범위 지정 조회
+scan 'messages', { STARTROW => 'room1', STOPROW => 'room2' }
+
+# room으로 시작하는 데이터 조회 => prefix 기준 조회
+scan 'messages', { FILTER => "PrefixFilter('room')" }
+```
