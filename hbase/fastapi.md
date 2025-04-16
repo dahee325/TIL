@@ -121,9 +121,9 @@ def get_messages():
 ```
 - `pip install pydantic` : 설치 -> fastAPI설치할 때 이미 설치됨
 - `uvicorn main:app --reload --port 9999` => `localhost:9999/docs`에 들어가서 테이블 생성됐는지 확인
-![alt text](create_table.png)
+![alt text](/hbase/assets/create_table.png)
 - room_name을 설정해서 execute로 보내면 입력한 정보를 create_chatroom함수의 chatroom변수로 받음
-![alt text](room_name.png)
+![alt text](/hbase/assets/room_name.png)
 - uuid(Universally Unique Identifier) : 세계적으로 고유한 식별자
 ```python
 from fastapi import FastAPI
@@ -154,7 +154,7 @@ def create_chatroom(chatroom: Chatroom):
         'room_name': chatroom.room_name
     }
 ```
-![alt text](chatroom_POST.png) => 에러가 안나면 성공
+![alt text](/hbase/assets/chatroom_POST.png) => 에러가 안나면 성공
 ```python
 @app.get('/chatrooms')
 def get_chatrooms():
@@ -172,7 +172,7 @@ def get_chatrooms():
         )
     return result
 ```
-![alt text](chatroom_GET.png)
+![alt text](/hbase/assets/chatroom_GET.png)
 ```python
 from datetime import datetime
 
@@ -197,7 +197,7 @@ def create_message(message: Message):
         'content': message.content,
     }
 ```
-![alt text](message_POST.png) => chatroom GET에서 chatroom_id복사해서 message POST에 입력하면 위처럼 결과가 나와야함
+![alt text](/hbase/assets/message_POST.png) => chatroom GET에서 chatroom_id복사해서 message POST에 입력하면 위처럼 결과가 나와야함
 ```python
 # 채팅방 안의 메세지 조회
 @app.get('/chatrooms/{room_id}/messages')
@@ -218,4 +218,4 @@ def get_messages(room_id: str):
         )
     return result
 ```
-![alt text](message_GET.png) => room_id를 입력했을 때 위처럼 뜨면 성공, 먼저 쓴 댓글이 맨 위에 뜸
+![alt text](/hbase/assets/message_GET.png) => room_id를 입력했을 때 위처럼 뜨면 성공, 먼저 쓴 댓글이 맨 위에 뜸
