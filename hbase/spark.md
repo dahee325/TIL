@@ -35,7 +35,6 @@ pyenv global 3.11.12 # 파이썬 버전 낮추고 다시 실행하면 됨
 sudo apt install openjdk-11-jdk
 ```
 
-
 ## [Zeppelin](https://zeppelin.apache.org/) install
 - zeppelin을 설치하려면 java11버전이 필요
 - 11.2-bin-netinst 버전 설치
@@ -74,7 +73,7 @@ print('hello')
 # shift+enter로 실행 또는 플레이버튼
 ```
 
-## RDD
+## 0. RDD
 - Spark RDD(Resilient Distributed Dataset)
 - 분산된 불변의 데이터 집합 -> spark에서 가장 기본이 되는 구조
 - `localhost:8080` 링크 접속 -> `Notebook 화살표` -> `Create new note` -> `0.RDD`이름 설정
@@ -167,7 +166,7 @@ print(method_rdd.collect())
 time_rdd = mapped_lines.map(lambda line: (line[1].split(':')[1], 1)).reduceByKey(lambda a, b: a+b)
 print(time_rdd.collect())
 ```
-- groupby 사용
+- 그룹으로 묶기
 ```
 # status code, api method 별 count
 # 2개의 데이터를 넣기 위해서 튜플 안에 튜플을 넣음
@@ -206,4 +205,158 @@ user_tuple = user_rdd.map(lambda user: (user[0], user)) # user_id가 0번째에 
 print(user_tuple.collect())
 # (user_id, post)
 post_tuple = post_rdd.map(lambda post: (post[1], post)) # user_id가 1번째에 위치
+```
+- join 사용
+```
+# 첫 변수를 기준으로 join해줌
+# 기본적으로 공통적으로 가진 데이터만 출력 -> 게시물을 작성하지 않은 사람은 빠짐
+joined_rdd = user_tuple.join(post_tuple)
+print(joined_rdd.collect())
+```
+![SQL join](/hbase/assets/sql_join.png)
+
+## 1. DF (DataFrame)
+- [spark dataframe](https://spark.apache.org/docs/latest/api/python/getting_started/quickstart_df.html)
+```
+%pyspark
+
+file_path = 'file:///home/ubuntu/damf2/data/logs/2024-01-01.log'
+
+df = spark.read.csv(file_path, sep=' ') # 띄어쓰기를 기준으로 분리, ""는 안에 띄어쓰기가 있어도 하나의 묶음으로 봄
+df.show() # 해당 데이터프레임을 표로 만들어서 보여줌
+```
+```
+%pyspark
+df.show(1) # 1행 출력
+```
+```
+%pyspark
+
+# 모든 컬럼 출력
+df.columns
+```
+```
+%pyspark
+
+# 스키마 구조 출력
+df.printSchema()
+```
+```
+%pyspark
+
+# 특정 컬럼 출력
+df.select('_c0', '_c1').show()
+```
+```
+%pyspark
+# 3개 행 출력
+df.take(3)
+```
+- `pip install pandas` : 가상환경이 비활성화된 상태에서 설치
+```
+%pyspark
+# pandas 형태의 dataframe으로 변환
+pd_df = df.toPandas()
+```
+```
+pd_df['_c0']
+pd_df[['_c0', '_c2']]
+```
+![pandas dataframe](/hbase/assets/pandas_df.png)
+```
+%pyspark
+# _c2만 출력
+df.select(df._c2).show()
+```
+- `pip install pyspark`
+```
+# _c2는 3개의 변수값을 갖고있음 -> 쪼갤 필요가 있음
+
+%pyspark
+from pyspark.sql.functions import split, col
+# _c2를 띄어쓰기를 기준으로 분리한 후 0번째 데이터를 이름이 method인 새로운 컬럼 생성
+df = df.withColumn('method', split(col('_c2'), ' ').getItem(0))
+df = df.withColumn('path', split(col('_c2'), ' ').getItem(1))
+df = df.withColumn('protocal', split(col('_c2'), ' ').getItem(2))
+
+df.show()
+```
+```
+%pyspark
+# method가 POST인 데이터만 출력
+df.filter(df.method == 'POST').show()
+```
+- groupby 사용
+```
+%pyspark
+# method별 데이터 개수
+df.groupby('method').count().show()
+```
+```
+%pyspark
+from pyspark.sql.functions import min, max, mean
+
+# method와 _c3 별 min, max, mean
+df.groupby('method', '_c3').agg(min('_c4'), max('_c4'), mean('_c4')).show()
+```
+=> 더 정확하게 하려면 형변환하고 실행해야함
+```
+%pyspark
+from pyspark.sql.functions import min, max, mean
+
+# _c4의 유형을 integer로 변경
+df = df.select('method', '_c3', col('_c4').cast('integer'))
+
+# method와 _c3 별 min, max, mean
+df.groupby('method', '_c3').agg(min('_c4'), max('_c4'), mean('_c4')).show()
+```
+```
+%pyspark
+
+file_path = 'file:///home/ubuntu/damf2/data/logs/2024-01-01.log'
+
+df = spark.read.csv(file_path, sep=' ')
+
+# 데이터프레임안의 데이터를 sql에 접근 가능한 테이블로 바꾸고 테이블 이름을 logs라 설정
+df.createOrReplaceTempView('logs')
+```
+```
+%pyspark
+spark.sql('''
+    SELECT * FROM logs
+''').show()
+```
+- sql문을 사용하여 _c2 분리
+```
+%pyspark
+df = spark.sql("""
+    SELECT *, SPLIT(_c2, ' ')[0] AS method, SPLIT(_c2, ' ')[1] AS path, SPLIT(_c2, ' ')[2] AS protocal
+    FROM logs
+""")
+df.show()
+df.createOrReplaceTempView('logs2')
+```
+```
+%pyspark
+# _c3가 400인 데이터만 출력
+spark.sql('''
+    SELECT * FROM logs2
+    WHERE _c3 = 400
+''').show()
+```
+```
+%pyspark
+# _c3가 200이고 path가 product를 포함하는 데이터 출력
+spark.sql('''
+    SELECT * FROM logs2
+    WHERE _c3 = 200 AND path LIKE '%product%'
+''').show()
+```
+```
+%pyspark
+# method별 데이터 개수
+spark.sql('''
+    SELECT method, COUNT(*) FROM logs2
+    GROUP BY method
+''').show()
 ```
