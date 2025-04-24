@@ -190,4 +190,5 @@ with DAG(
     t1
 ```
 
-=> spark/07.yt_data : zeppelin으로 자동화 실행
+
+=> `spark/07.yt_data` : zeppelin으로 자동화 실행

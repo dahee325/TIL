@@ -324,8 +324,3 @@ save_to_hdfs(data, '/input/yt-data')
 => airflow로 자동화시키기 \
 -> 07_collect_yt_comments.py : 댓글 모으기\
 -> 08_yt_data_ETL.py : json파일 csv파일로 바꿔서 저장
-
-
-
-
-![alt text](/airflow/assets/youtube.png)
