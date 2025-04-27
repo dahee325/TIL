@@ -122,6 +122,6 @@ TIL(Today I Learned)
     - 04_upload_to_hdfs
     - 05_bitcoin
     - 06_upload_to_s3
-    - outube
+    - youtube
     - 07_collect_yt_comments
     - 08_yt_data_ETL
