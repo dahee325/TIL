@@ -107,8 +107,21 @@ TIL(Today I Learned)
 
 ### 4월 4주차
 - spark
-    - 03.regression
-    - 04.classification
-    - 05.recommendation
-    - 06.streaming
+    - 3.regression
+    - 4.classification
+    - 5.recommendation
+    - 6.streaming
     - kafka
+    - 7.yt_data
+- airflow
+    - airflow
+    - 00_intro
+    - 01_bash_operator
+    - 02_python_operator
+    - 03_generate_review
+    - 04_upload_to_hdfs
+    - 05_bitcoin
+    - 06_upload_to_s3
+    - youtube
+    - 07_collect_yt_comments
+    - 08_yt_data_ETL
