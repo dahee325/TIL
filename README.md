@@ -125,3 +125,19 @@ TIL(Today I Learned)
     - youtube
     - 07_collect_yt_comments
     - 08_yt_data_ETL
+
+### 4월 5주차
+- elasticsearch
+    - elasticsearch
+    - 02_구성
+    - 03_데이터모델링
+    - 04_데이터검색
+    - 05_데이터집계
+    - 06_고급검색
+
+### 5월 1주차
+- elasticsearch
+    - 07_한글검색확장기능
+    - ELK
+    - dashboard
+    - ecommerce
