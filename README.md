@@ -134,10 +134,14 @@ TIL(Today I Learned)
     - 04_데이터검색
     - 05_데이터집계
     - 06_고급검색
+- 2차평가
 
-### 5월 1주차
+### 5월 1주차(5월 2주차)
 - elasticsearch
     - 07_한글검색확장기능
     - ELK
     - dashboard
     - ecommerce
+
+### 5월 3주차
+- 3차평가 -> elasticsearch
